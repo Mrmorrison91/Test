@@ -47,6 +47,7 @@ public class MyBots extends TelegramLongPollingBot {
 				e.printStackTrace();
 			}
 
+			
 			if (received_text.substring(0, 10).equalsIgnoreCase("mailbomber")) {
 
 				String datiDellUtente[] = received_text.split("\\s");
@@ -68,7 +69,7 @@ public class MyBots extends TelegramLongPollingBot {
 								+ "NUMERO EMAIL " + n + "\n" + "Attendi la risposta...");
 
 						try {
-							sendMessage(message);
+							sendMessage(message); // metodo che invia il messaggio all'utente
 						} catch (TelegramApiException e) {
 							e.printStackTrace();
 						}
