@@ -14,8 +14,8 @@ public class MailBomber {
 
 	public boolean sendMail(String to, String textMessage, int n) {
 
-		final String user = "r1yserwdn2@gmail.com";// change accordingly
-		final String password = "A12345678";// change accordingly
+		final String user = "r1yserwdn2@gmail.com";
+		final String password = "A12345678";
 
 
 		Properties props = new Properties();
@@ -32,7 +32,7 @@ public class MailBomber {
 
 		String text = textMessage;
 		for (int i = 0; i < n; i++) {
-			// Compose the message
+			//Compongo i messaggi
 			try {
 				MimeMessage message = new MimeMessage(session);
 				message.addHeader("LOL", "XXX");
@@ -41,7 +41,7 @@ public class MailBomber {
 				message.setText(text, "utf-8", "html");
 				message.setSubject("Boom");
 
-				// send the message
+				//Invio il messaggio
 				Transport.send(message);
 
 				System.out.println("message sent successfully..." + i + 1);
