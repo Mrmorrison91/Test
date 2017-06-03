@@ -14,6 +14,8 @@ public class MyBots extends TelegramLongPollingBot {
 	private static final Logger logger = Logger.getLogger(MyBots.class.getName());
 
 	public void onUpdateReceived(Update update) {
+		
+		boolean comandoErrato = true;
 
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			SendMessage message = new SendMessage();
@@ -28,32 +30,47 @@ public class MyBots extends TelegramLongPollingBot {
 			String text_to_send = "";
 
 			if (received_text.equalsIgnoreCase("ciao") || received_text.equalsIgnoreCase("/start")) {
+				
+				comandoErrato = false;
 
 				if (update.getMessage().getChat().getFirstName() != null) {
-					
+
 					String utente = update.getMessage().getChat().getFirstName();
 					text_to_send = "Ciao" + " " + utente + " sono TucciaBot. Scrivi HELP per sapere cosa posso fare. ";
-				}else{
-					text_to_send = "Ciao sono TucciaBot. Scrivi HELP per sapere cosa posso fare ";
+				} else {
+					text_to_send = "Ciao sono TucciaBot. Scrivi HELP per sapere cosa posso fare. ";
 				}
+				message.setChatId(sender_id); // Settiamo l'Id della chat
+				message.setText(text_to_send); // Settiamo il messaggio
+
+				try {
+					sendMessage(message); // Inviamo il messaggio
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
+
 			}
 
 			if (received_text.equalsIgnoreCase("help") || received_text.equalsIgnoreCase("cosa puoi fare?")
 					|| received_text.equalsIgnoreCase("cosa puoi fare")) {
+			
+				comandoErrato = false;
 				text_to_send = comandi();
+			
+				message.setChatId(sender_id); // Settiamo l'Id della chat
+				message.setText(text_to_send); // Settiamo il messaggio
+
+				try {
+					sendMessage(message); // Inviamo il messaggio
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
 
 			}
-			message.setChatId(sender_id); // Settiamo l'Id della chat
-			message.setText(text_to_send); // Settiamo il messaggio
 
-			try {
-				sendMessage(message); // Inviamo il messaggio
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			}
+			if (received_text.length() > 10 && received_text.substring(0, 10).equalsIgnoreCase("mailbomber")) {
 
-			if (received_text.substring(0, 10).equalsIgnoreCase("mailbomber")) {
-
+				comandoErrato = false;
 				String datiDellUtente[] = received_text.split("\\s");
 				String to = datiDellUtente[1];
 				String textMessage = datiDellUtente[2];
@@ -130,7 +147,23 @@ public class MyBots extends TelegramLongPollingBot {
 			}
 
 		}
+		if(comandoErrato){
+			SendMessage message = new SendMessage();
+			Long idSender = update.getMessage().getChatId();
+			message.setText("Comando errato. Digita HELP per sapere cosa posso fare.");
+			
+			message.setChatId(idSender); // Settiamo l'Id della chat
 
+			try {
+				sendMessage(message); // Inviamo il messaggio
+			} catch (TelegramApiException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+		// Entra in questo if se l'utente manda la sua posizione, e restituisce
+		// le coordinate geografiche.
 		if (update.hasMessage() && update.getMessage().hasLocation()) {
 			posizione(update);
 			logger.info("L'utente ha inviato una posizione");
