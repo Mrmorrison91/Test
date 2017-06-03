@@ -17,12 +17,14 @@ public class MyBots extends TelegramLongPollingBot {
 		
 		boolean comandoErrato = true;
 
-		if (update.hasMessage() && update.getMessage().hasText()) {
+		// Controllo se il messaggio inviato dall'utente è un messaggio e che contiene testo
+		if (update.hasMessage() && update.getMessage().hasText()) { 
 			SendMessage message = new SendMessage();
-			Long sender_id = update.getMessage().getChatId();
+			//Prendo l'ip del messaggio
+			Long sender_id = update.getMessage().getChatId(); 
 
 			logger.info("ID MESSAGE: " + sender_id);
-
+			//Prendo il testo del messaggio inviato dall'utente
 			String received_text = update.getMessage().getText().trim();
 
 			logger.info("MESSAGE RICEVUTO: " + received_text);
@@ -33,8 +35,9 @@ public class MyBots extends TelegramLongPollingBot {
 				
 				comandoErrato = false;
 
+				//Controllo se l'utente ha impostato il suo nome su Telegram
 				if (update.getMessage().getChat().getFirstName() != null) {
-
+					
 					String utente = update.getMessage().getChat().getFirstName();
 					text_to_send = "Ciao" + " " + utente + " sono TucciaBot. Scrivi HELP per sapere cosa posso fare. ";
 				} else {
@@ -150,8 +153,8 @@ public class MyBots extends TelegramLongPollingBot {
 		if(comandoErrato){
 			SendMessage message = new SendMessage();
 			Long idSender = update.getMessage().getChatId();
-			message.setText("Comando errato. Digita HELP per sapere cosa posso fare.");
 			
+			message.setText("Comando errato. Digita HELP per sapere cosa posso fare.");
 			message.setChatId(idSender); // Settiamo l'Id della chat
 
 			try {
