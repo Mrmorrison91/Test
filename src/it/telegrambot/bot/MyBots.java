@@ -1,0 +1,175 @@
+package it.telegrambot.bot;
+
+import java.util.logging.Logger;
+
+import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+
+import it.telegrambot.mailbomber.MailBomber;
+
+public class MyBots extends TelegramLongPollingBot {
+
+	private static final Logger logger = Logger.getLogger(MyBots.class.getName());
+
+	public void onUpdateReceived(Update update) {
+
+		if (update.hasMessage() && update.getMessage().hasText()) {
+			SendMessage message = new SendMessage();
+			Long sender_id = update.getMessage().getChatId();
+
+			logger.info("ID MESSAGE: " + sender_id);
+
+			String received_text = update.getMessage().getText().trim();
+
+			logger.info("MESSAGE RICEVUTO: " + received_text);
+
+			String text_to_send = "";
+
+			if (received_text.equalsIgnoreCase("ciao")) {
+				String utente = update.getMessage().getChat().getFirstName() + " "
+						+ update.getMessage().getChat().getLastName();
+				text_to_send = "Ciao" + " " + utente + " sono TucciaBot ";
+			} 
+
+			if (received_text.equalsIgnoreCase("help") || received_text.equalsIgnoreCase("cosa puoi fare?")
+					|| received_text.equalsIgnoreCase("cosa puoi fare")) {
+				text_to_send = comandi();
+
+			}
+			message.setChatId(sender_id); // Settiamo l'Id della chat
+			message.setText(text_to_send); // Settiamo il messaggio
+
+			try {
+				sendMessage(message); // Inviamo il messaggio
+			} catch (TelegramApiException e) {
+				e.printStackTrace();
+			}
+
+			if (received_text.substring(0, 10).equalsIgnoreCase("mailbomber")) {
+
+				String datiDellUtente[] = received_text.split("\\s");
+				String to = datiDellUtente[1];
+				String textMessage = datiDellUtente[2];
+				int n = Integer
+						.parseInt(datiDellUtente[3] != "" || datiDellUtente[3] != null ? datiDellUtente[3] : "0");
+
+				if (to != null && text_to_send != null) {
+
+					if (to.contains("@") && to.contains(".") && n != 0) {
+
+						logger.info("Email della vittima: " + to);
+						logger.info("Testo dell'email: " + textMessage);
+						logger.info("Numero dell'invio: " + n);
+
+						message.setChatId(sender_id);
+						message.setText("EMAIL DELLA VITTIMA: " + to + "\n" + "TESTO DELL'EMAIL: " + textMessage + "\n"
+								+ "NUMERO EMAIL " + n + "\n" + "Attendi la risposta...");
+
+						try {
+							sendMessage(message);
+						} catch (TelegramApiException e) {
+							e.printStackTrace();
+						}
+						
+
+						MailBomber mailBomber = new MailBomber();
+
+						boolean resultEmail = mailBomber.sendMail(to, textMessage, n);
+
+						if (resultEmail) {
+
+							message.setChatId(sender_id);
+							message.setText("L'email sono state spedite con successo alla vittima: " + to);
+							try {
+								sendMessage(message);
+							} catch (TelegramApiException e) {
+								e.printStackTrace();
+							}
+
+						} else {
+
+							message.setChatId(sender_id);
+							message.setText("L'email non sono state spedite alla vittima: " + to);
+							try {
+								sendMessage(message);
+							} catch (TelegramApiException e) {
+								e.printStackTrace();
+							}
+
+						}
+					} else {
+						text_to_send = "Email errata.";
+						if (n <= 0) {
+							text_to_send = text_to_send + " " + "Impossibile inviare " + n + " email. RIPROVA";
+						}
+						message.setChatId(sender_id);
+						message.setText(text_to_send);
+						try {
+							sendMessage(message);
+						} catch (TelegramApiException e) {
+							e.printStackTrace();
+						}
+					}
+				} else {
+					text_to_send = "I dati che hai inserito sono errati. RIPROVA";
+					message.setChatId(sender_id);
+					message.setText(text_to_send);
+					try {
+						sendMessage(message);
+					} catch (TelegramApiException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+		}
+
+		if (update.hasMessage() && update.getMessage().hasLocation()) {
+			posizione(update);
+			logger.info("L'utente ha inviato una posizione");
+			SendMessage messageLocation = posizione(update);
+			try {
+				sendMessage(messageLocation);
+			} catch (TelegramApiException e) {
+
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public SendMessage posizione(Update update) {
+		SendMessage message = new SendMessage();
+		Double latitudine = null;
+		Double longitudine = null;
+
+		if (update.hasMessage() && update.getMessage().hasLocation()) {
+
+			Long idLocation = update.getMessage().getChatId();
+			latitudine = update.getMessage().getLocation().getLatitude();
+			longitudine = update.getMessage().getLocation().getLongitude();
+			logger.info("L'id Location è:_" + idLocation);
+			message.setChatId(idLocation);
+		}
+
+		return message.setText("La tua latitudine e: " + String.valueOf(latitudine) + " La tua longitudine è: "
+				+ String.valueOf(longitudine));
+	}
+
+	public String getBotUsername() {
+		return "TucciaBot"; // Nome del bot
+	}
+
+	public String getBotToken() {
+		return "394874277:AAGx6beZgGIkkSxMQScCUSrGxvVoMKmrx5Q"; // Token del bot
+																// per lo
+																// sviluppo
+	}
+
+	public String comandi() {
+		return "I comandi sono: CIAO - MAILBOMBER (indirizzo vittima - testo email - numero di email )";
+	}
+
+}
