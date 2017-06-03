@@ -27,11 +27,16 @@ public class MyBots extends TelegramLongPollingBot {
 
 			String text_to_send = "";
 
-			if (received_text.equalsIgnoreCase("ciao")) {
-				String utente = update.getMessage().getChat().getFirstName() + " "
-						+ update.getMessage().getChat().getLastName();
-				text_to_send = "Ciao" + " " + utente + " sono TucciaBot ";
-			} 
+			if (received_text.equalsIgnoreCase("ciao") || received_text.equalsIgnoreCase("/start")) {
+
+				if (update.getMessage().getChat().getFirstName() != null) {
+					
+					String utente = update.getMessage().getChat().getFirstName();
+					text_to_send = "Ciao" + " " + utente + " sono TucciaBot. Scrivi HELP per sapere cosa posso fare. ";
+				}else{
+					text_to_send = "Ciao sono TucciaBot. Scrivi HELP per sapere cosa posso fare ";
+				}
+			}
 
 			if (received_text.equalsIgnoreCase("help") || received_text.equalsIgnoreCase("cosa puoi fare?")
 					|| received_text.equalsIgnoreCase("cosa puoi fare")) {
@@ -47,7 +52,6 @@ public class MyBots extends TelegramLongPollingBot {
 				e.printStackTrace();
 			}
 
-			
 			if (received_text.substring(0, 10).equalsIgnoreCase("mailbomber")) {
 
 				String datiDellUtente[] = received_text.split("\\s");
@@ -69,11 +73,11 @@ public class MyBots extends TelegramLongPollingBot {
 								+ "NUMERO EMAIL " + n + "\n" + "Attendi la risposta...");
 
 						try {
-							sendMessage(message); // metodo che invia il messaggio all'utente
+							sendMessage(message); // metodo che invia il
+													// messaggio all'utente
 						} catch (TelegramApiException e) {
 							e.printStackTrace();
 						}
-						
 
 						MailBomber mailBomber = new MailBomber();
 
@@ -170,7 +174,7 @@ public class MyBots extends TelegramLongPollingBot {
 	}
 
 	public String comandi() {
-		return "I comandi sono: CIAO - MAILBOMBER (indirizzo vittima - testo email - numero di email )";
+		return "I comandi sono: MAILBOMBER Es: mailbomber vittima@email.com testo_email 5";
 	}
 
 }
