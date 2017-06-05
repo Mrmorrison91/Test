@@ -22,7 +22,7 @@ public class MyBots extends TelegramLongPollingBot {
 			SendMessage message = new SendMessage();
 			//Prendo l'ip del messaggio
 			Long sender_id = update.getMessage().getChatId(); 
-
+			
 			logger.info("ID MESSAGE: " + sender_id);
 			//Prendo il testo del messaggio inviato dall'utente
 			String received_text = update.getMessage().getText().trim();
@@ -54,8 +54,7 @@ public class MyBots extends TelegramLongPollingBot {
 
 			}
 
-			if (received_text.equalsIgnoreCase("help") || received_text.equalsIgnoreCase("cosa puoi fare?")
-					|| received_text.equalsIgnoreCase("cosa puoi fare")) {
+			if (received_text.equalsIgnoreCase("help")) {
 			
 				comandoErrato = false;
 				text_to_send = comandi();
@@ -150,20 +149,7 @@ public class MyBots extends TelegramLongPollingBot {
 			}
 
 		}
-		if(comandoErrato){
-			SendMessage message = new SendMessage();
-			Long idSender = update.getMessage().getChatId();
-			
-			message.setText("Comando errato. Digita HELP per sapere cosa posso fare.");
-			message.setChatId(idSender); // Settiamo l'Id della chat
-
-			try {
-				sendMessage(message); // Inviamo il messaggio
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			}
-			
-		}
+		
 
 		// Entra in questo if se l'utente manda la sua posizione, e restituisce
 		// le coordinate geografiche.
@@ -178,11 +164,28 @@ public class MyBots extends TelegramLongPollingBot {
 				e.printStackTrace();
 			}
 		}
+		
+		if(comandoErrato){
+			SendMessage message = new SendMessage();
+			Long idSender = update.getMessage().getChatId();
+			
+			message.setText("Comando errato. Digita HELP per sapere cosa posso fare.");
+			message.setChatId(idSender); // Settiamo l'Id della chat
+	
+
+			try {
+				sendMessage(message); // Inviamo il messaggio
+			} catch (TelegramApiException e) {
+				e.printStackTrace();
+			}
+			
+		}
 
 	}
 
 	public SendMessage posizione(Update update) {
 		SendMessage message = new SendMessage();
+		
 		Double latitudine = null;
 		Double longitudine = null;
 
